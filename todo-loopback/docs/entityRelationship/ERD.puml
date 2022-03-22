@@ -1,0 +1,51 @@
+@startuml Entity Relationship
+
+entity Todo {
+  * id: ObjectID <<generated>>
+  --
+  * title: string
+  description: string
+  asignee: ObjectId
+  isDone: boolean
+  isDeleted: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+entity Project {
+  * id: ObjectID <<generated>>
+  --
+  * title: string
+  description: string
+  isDone: boolean
+  isDeleted: boolean
+  users: Object[]
+  todos: Object[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+entity User {
+  * id: ObjectID <<generated>>
+  --
+  * name: string
+  phoneNumber: string
+  *email: string
+  * password: string
+  isActive: boolean
+  isDeleted: boolean
+  role: ERole
+  ' enum ERole {
+  '   ADMIN = 'admin',
+  '   USER = 'user'
+  ' }
+  lastSignInAt: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+Project ||--o{ User
+Project ||--o{ Todo
+User ||--o{ Todo
+
+@enduml
