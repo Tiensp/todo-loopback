@@ -1,0 +1,89 @@
+@startuml Relationship
+
+entity Todo {
+  * id: ObjectID <<generated>>
+  --
+  userId: ObjectID
+  * projectId: ObjectID
+  --
+  * title: string
+  description: string
+  isComplete: boolean
+  isDeleted: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+entity Project {
+  * id: ObjectID <<generated>>
+  --
+  * title: string
+  description: string
+  isComplete: boolean
+  isDeleted: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+entity User {
+  * id: ObjectID <<generated>>
+  --
+  * name: string
+  phoneNumber: string
+  *email: string
+  * password: string
+  isActive: boolean
+  isDeleted: boolean
+  lastSignInAt: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+entity ProjectUser {
+  * projectId: ObjectID
+  * userId: ObjectID
+  --
+  role: ERole
+  ' enum ERole {
+  '   ADMIN = 'admin',
+  '   USER = 'user'
+  ' }
+  isDeleted: boolean
+  createdAt: Date
+}
+
+entity "Project" as ProjectCopy {
+  * id: ObjectID <<generated>>
+  --
+  * title: string
+  description: string
+  isComplete: boolean
+  isDeleted: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+entity "User" as UserCopy {
+  * id: ObjectID <<generated>>
+  --
+  * name: string
+  phoneNumber: string
+  *email: string
+  * password: string
+  isActive: boolean
+  isDeleted: boolean
+  lastSignInAt: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+ProjectCopy ||--o{ ProjectUser
+ProjectCopy ||--|| ProjectUser
+ProjectUser }o--|| UserCopy
+ProjectUser ||--|| UserCopy
+Project ||--o{ Todo
+Project ||--|| Todo
+User ||--o{ Todo
+Todo ||--o| User
+
+@enduml

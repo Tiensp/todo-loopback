@@ -3,13 +3,14 @@
 entity Todo {
   * id: ObjectID <<generated>>
   --
+  assignedTo: ObjectID
+  * projectId: ObjectID
+  * createdBy: ObjectID
+  parentId: ObjectID
+  --
   * title: string
   description: string
-  asignee: ObjectId
-  isDone: boolean
-  isDeleted: boolean
-  createdAt: Date
-  updatedAt: Date
+  isCompleted: boolean
 }
 
 entity Project {
@@ -17,12 +18,7 @@ entity Project {
   --
   * title: string
   description: string
-  isDone: boolean
-  isDeleted: boolean
-  users: Object[]
-  todos: Object[]
-  createdAt: Date
-  updatedAt: Date
+  isCompleted: boolean
 }
 
 entity User {
@@ -33,19 +29,26 @@ entity User {
   *email: string
   * password: string
   isActive: boolean
-  isDeleted: boolean
+  lastSignInAt: Date
+}
+
+entity ProjectUser {
+  * id: ObjectID <<generated>>
+  --
+  * projectId: ObjectID
+  * userId: ObjectID
+  --
   role: ERole
   ' enum ERole {
   '   ADMIN = 'admin',
   '   USER = 'user'
   ' }
-  lastSignInAt: Date
-  createdAt: Date
-  updatedAt: Date
 }
 
-Project ||--o{ User
+Project ||--o{ ProjectUser
 Project ||--o{ Todo
+ProjectUser }o--|| User
 User ||--o{ Todo
+Todo ||--o{ Todo
 
 @enduml
