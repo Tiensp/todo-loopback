@@ -1,3 +1,4 @@
+import { authenticate } from '@loopback/authentication';
 import {
   repository,
 } from '@loopback/repository';
@@ -12,6 +13,7 @@ import {
 } from '../models';
 import {TodoRepository} from '../repositories';
 
+@authenticate('jwt')
 export class TodoUserController {
   constructor(
     @repository(TodoRepository)
@@ -31,8 +33,8 @@ export class TodoUserController {
     },
   })
   async getUser(
-    @param.path.number('id') id: typeof Todo.prototype.id,
+    @param.path.string('id') id: typeof Todo.prototype.id,
   ): Promise<User> {
-    return this.todoRepository.todos(id);
+    return this.todoRepository.userAssignedTo(id);
   }
 }

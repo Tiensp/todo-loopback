@@ -1,3 +1,4 @@
+import { authenticate } from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -21,6 +22,7 @@ import {
 } from '../models';
 import {ProjectRepository} from '../repositories';
 
+@authenticate('jwt')
 export class ProjectTodoController {
   constructor(
     @repository(ProjectRepository) protected projectRepository: ProjectRepository,
@@ -39,10 +41,10 @@ export class ProjectTodoController {
     },
   })
   async find(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Todo>,
   ): Promise<Todo[]> {
-    return this.projectRepository.todos(id).find(filter);
+    return this.projectRepository.todoInProject(id).find(filter);
   }
 
   @post('/projects/{id}/todos', {
@@ -54,7 +56,7 @@ export class ProjectTodoController {
     },
   })
   async create(
-    @param.path.number('id') id: typeof Project.prototype.id,
+    @param.path.string('id') id: typeof Project.prototype.id,
     @requestBody({
       content: {
         'application/json': {
@@ -67,7 +69,7 @@ export class ProjectTodoController {
       },
     }) todo: Omit<Todo, 'id'>,
   ): Promise<Todo> {
-    return this.projectRepository.todos(id).create(todo);
+    return this.projectRepository.todoInProject(id).create(todo);
   }
 
   @patch('/projects/{id}/todos', {
@@ -79,7 +81,7 @@ export class ProjectTodoController {
     },
   })
   async patch(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -90,7 +92,7 @@ export class ProjectTodoController {
     todo: Partial<Todo>,
     @param.query.object('where', getWhereSchemaFor(Todo)) where?: Where<Todo>,
   ): Promise<Count> {
-    return this.projectRepository.todos(id).patch(todo, where);
+    return this.projectRepository.todoInProject(id).patch(todo, where);
   }
 
   @del('/projects/{id}/todos', {
@@ -102,9 +104,9 @@ export class ProjectTodoController {
     },
   })
   async delete(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Todo)) where?: Where<Todo>,
   ): Promise<Count> {
-    return this.projectRepository.todos(id).delete(where);
+    return this.projectRepository.todoInProject(id).delete(where);
   }
 }

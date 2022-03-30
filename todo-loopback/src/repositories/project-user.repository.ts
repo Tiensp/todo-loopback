@@ -11,17 +11,17 @@ export class ProjectUserRepository extends DefaultCrudRepository<
   ProjectUserRelations
 > {
 
-  public readonly project: BelongsToAccessor<Project, typeof ProjectUser.prototype.id>;
+  public readonly projectBelongsTo: BelongsToAccessor<Project, typeof ProjectUser.prototype.id>;
 
-  public readonly user: BelongsToAccessor<User, typeof ProjectUser.prototype.id>;
+  public readonly userBelongsTo: BelongsToAccessor<User, typeof ProjectUser.prototype.id>;
 
   constructor(
     @inject('datasources.db') dataSource: DbDataSource, @repository.getter('ProjectRepository') protected projectRepositoryGetter: Getter<ProjectRepository>, @repository.getter('UserRepository') protected userRepositoryGetter: Getter<UserRepository>,
   ) {
     super(ProjectUser, dataSource);
-    this.user = this.createBelongsToAccessorFor('user', userRepositoryGetter,);
-    this.registerInclusionResolver('user', this.user.inclusionResolver);
-    this.project = this.createBelongsToAccessorFor('project', projectRepositoryGetter,);
-    this.registerInclusionResolver('project', this.project.inclusionResolver);
+    this.userBelongsTo = this.createBelongsToAccessorFor('userBelongsTo', userRepositoryGetter,);
+    this.registerInclusionResolver('userBelongsTo', this.userBelongsTo.inclusionResolver);
+    this.projectBelongsTo = this.createBelongsToAccessorFor('projectBelongsTo', projectRepositoryGetter,);
+    this.registerInclusionResolver('projectBelongsTo', this.projectBelongsTo.inclusionResolver);
   }
 }

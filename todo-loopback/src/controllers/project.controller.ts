@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -7,23 +8,24 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
 import {Project} from '../models';
 import {ProjectRepository} from '../repositories';
 
+@authenticate('jwt')
 export class ProjectController {
   constructor(
     @repository(ProjectRepository)
-    public projectRepository : ProjectRepository,
+    public projectRepository: ProjectRepository,
   ) {}
 
   @post('/projects')
@@ -52,9 +54,7 @@ export class ProjectController {
     description: 'Project model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Project) where?: Where<Project>,
-  ): Promise<Count> {
+  async count(@param.where(Project) where?: Where<Project>): Promise<Count> {
     return this.projectRepository.count(where);
   }
 
@@ -105,8 +105,9 @@ export class ProjectController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
-    @param.filter(Project, {exclude: 'where'}) filter?: FilterExcludingWhere<Project>
+    @param.path.string('id') id: string,
+    @param.filter(Project, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Project>,
   ): Promise<Project> {
     return this.projectRepository.findById(id, filter);
   }
@@ -116,7 +117,7 @@ export class ProjectController {
     description: 'Project PATCH success',
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -134,7 +135,7 @@ export class ProjectController {
     description: 'Project PUT success',
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() project: Project,
   ): Promise<void> {
     await this.projectRepository.replaceById(id, project);
@@ -144,7 +145,7 @@ export class ProjectController {
   @response(204, {
     description: 'Project DELETE success',
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.projectRepository.deleteById(id);
   }
 }

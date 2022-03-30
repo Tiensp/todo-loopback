@@ -1,3 +1,4 @@
+import { authenticate } from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -20,6 +21,7 @@ import {
 import {ProjectUser} from '../models';
 import {ProjectUserRepository} from '../repositories';
 
+@authenticate('jwt')
 export class ProjectUserController {
   constructor(
     @repository(ProjectUserRepository)
@@ -105,7 +107,7 @@ export class ProjectUserController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.filter(ProjectUser, {exclude: 'where'}) filter?: FilterExcludingWhere<ProjectUser>
   ): Promise<ProjectUser> {
     return this.projectUserRepository.findById(id, filter);
@@ -116,7 +118,7 @@ export class ProjectUserController {
     description: 'ProjectUser PATCH success',
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -134,7 +136,7 @@ export class ProjectUserController {
     description: 'ProjectUser PUT success',
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() projectUser: ProjectUser,
   ): Promise<void> {
     await this.projectUserRepository.replaceById(id, projectUser);
@@ -144,7 +146,7 @@ export class ProjectUserController {
   @response(204, {
     description: 'ProjectUser DELETE success',
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.projectUserRepository.deleteById(id);
   }
 }

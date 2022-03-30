@@ -13,12 +13,10 @@ export class MyUserService implements UserService<User, Credentials> {
     @repository(UserRepository)
     public userRepository: UserRepository,
 
-    // @inject('service.hasher')
     @inject(PasswordHasherBindings.PASSWORD_HASHER)
     public hasher: BcryptHasher,
   ) {}
   async verifyCredentials(credentials: Credentials): Promise<User> {
-    // implement this method
     const foundUser = await this.userRepository.findOne({
       where: {
         email: credentials.email,

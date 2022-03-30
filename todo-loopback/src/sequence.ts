@@ -14,10 +14,6 @@ import {
 const SequenceActions = RestBindings.SequenceActions;
 
 export class MySequence implements SequenceHandler {
-  /**
-   * Optional invoker for registered middleware in a chain.
-   * To be injected via SequenceActions.INVOKE_MIDDLEWARE.
-   */
   @inject(SequenceActions.INVOKE_MIDDLEWARE, {optional: true})
   protected invokeMiddleware: InvokeMiddleware = () => false;
 

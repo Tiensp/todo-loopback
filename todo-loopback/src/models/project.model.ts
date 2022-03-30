@@ -5,11 +5,11 @@ import {ProjectUser} from './project-user.model';
 @model()
 export class Project extends Entity {
   @property({
-    type: 'number',
+    type: 'string',
     id: true,
     generated: true,
   })
-  id?: number;
+  id?: string;
 
   @property({
     type: 'string',
@@ -24,14 +24,15 @@ export class Project extends Entity {
 
   @property({
     type: 'boolean',
+    default: false
   })
   isCompleted?: boolean;
 
   @hasMany(() => Todo)
-  todos: Todo[];
+  todoInProject: Todo[];
 
   @hasMany(() => ProjectUser)
-  projectUsers: ProjectUser[];
+  projectUserInProject: ProjectUser[];
 
   constructor(data?: Partial<Project>) {
     super(data);

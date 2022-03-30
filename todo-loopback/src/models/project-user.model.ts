@@ -5,21 +5,22 @@ import {User} from './user.model';
 @model()
 export class ProjectUser extends Entity {
   @property({
-    type: 'number',
+    type: 'string',
     id: true,
     generated: true,
   })
-  id?: number;
+  id?: string;
   @property({
     type: 'string',
+    required: true,
   })
-  role?: string;
+  role: string;
 
-  @belongsTo(() => Project)
-  projectId: number;
+  @belongsTo(() => Project, {name: 'projectBelongsTo'})
+  projectId: string;
 
-  @belongsTo(() => User)
-  userId: number;
+  @belongsTo(() => User, {name: 'userBelongsTo'})
+  userId: string;
 
   constructor(data?: Partial<ProjectUser>) {
     super(data);

@@ -34,6 +34,7 @@ import {JWTService} from '../services/jwt.service';
 import {MyUserService} from '../services/user.service';
 import {OPERATION_SECURITY_SPEC} from '../utils/security.spec';
 
+@authenticate('jwt')
 export class UserController {
   constructor(
     @repository(UserRepository)
@@ -49,6 +50,7 @@ export class UserController {
     public jwtService: JWTService,
   ) {}
 
+  @authenticate.skip()
   @post('/signup', {
     responses: {
       '200': {
@@ -59,14 +61,26 @@ export class UserController {
       },
     },
   })
-  async signup(@requestBody() userData: User) {
+  async signup(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(User, {
+            title: 'NewUser',
+            exclude: ['id'],
+          }),
+        },
+      },
+    })
+    userData: Omit<User, 'id'>,
+  ) {
     validateCredentials(_.pick(userData, ['email', 'password']));
     userData.password = await this.hasher.hashPassword(userData.password);
     const savedUser = await this.userRepository.create(userData);
-    //delete savedUser.password;
-    return savedUser;
+    return _.omit(savedUser, 'password');
   }
 
+  @authenticate.skip()
   @post('/login', {
     responses: {
       '200': {
@@ -96,7 +110,6 @@ export class UserController {
     return Promise.resolve({token: token});
   }
 
-  @authenticate('jwt')
   @get('/users/me', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
@@ -192,7 +205,7 @@ export class UserController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.filter(User, {exclude: 'where'}) filter?: FilterExcludingWhere<User>,
   ): Promise<User> {
     return this.userRepository.findById(id, filter);
@@ -203,7 +216,7 @@ export class UserController {
     description: 'User PATCH success',
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -221,7 +234,7 @@ export class UserController {
     description: 'User PUT success',
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() user: User,
   ): Promise<void> {
     await this.userRepository.replaceById(id, user);
@@ -231,7 +244,7 @@ export class UserController {
   @response(204, {
     description: 'User DELETE success',
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.userRepository.deleteById(id);
   }
 }

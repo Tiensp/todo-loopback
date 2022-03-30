@@ -1,3 +1,4 @@
+import { authenticate } from '@loopback/authentication';
 import {
   repository,
 } from '@loopback/repository';
@@ -12,6 +13,7 @@ import {
 } from '../models';
 import {ProjectUserRepository} from '../repositories';
 
+@authenticate('jwt')
 export class ProjectUserUserController {
   constructor(
     @repository(ProjectUserRepository)
@@ -31,8 +33,8 @@ export class ProjectUserUserController {
     },
   })
   async getUser(
-    @param.path.number('id') id: typeof ProjectUser.prototype.id,
+    @param.path.string('id') id: typeof ProjectUser.prototype.id,
   ): Promise<User> {
-    return this.projectUserRepository.user(id);
+    return this.projectUserRepository.userBelongsTo(id);
   }
 }

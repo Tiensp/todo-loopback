@@ -1,3 +1,4 @@
+import { authenticate } from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -21,6 +22,7 @@ import {
 } from '../models';
 import {ProjectRepository} from '../repositories';
 
+@authenticate('jwt')
 export class ProjectProjectUserController {
   constructor(
     @repository(ProjectRepository) protected projectRepository: ProjectRepository,
@@ -39,10 +41,10 @@ export class ProjectProjectUserController {
     },
   })
   async find(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<ProjectUser>,
   ): Promise<ProjectUser[]> {
-    return this.projectRepository.projectUsers(id).find(filter);
+    return this.projectRepository.projectUserInProject(id).find(filter);
   }
 
   @post('/projects/{id}/project-users', {
@@ -54,7 +56,7 @@ export class ProjectProjectUserController {
     },
   })
   async create(
-    @param.path.number('id') id: typeof Project.prototype.id,
+    @param.path.string('id') id: typeof Project.prototype.id,
     @requestBody({
       content: {
         'application/json': {
@@ -67,7 +69,7 @@ export class ProjectProjectUserController {
       },
     }) projectUser: Omit<ProjectUser, 'id'>,
   ): Promise<ProjectUser> {
-    return this.projectRepository.projectUsers(id).create(projectUser);
+    return this.projectRepository.projectUserInProject(id).create(projectUser);
   }
 
   @patch('/projects/{id}/project-users', {
@@ -79,7 +81,7 @@ export class ProjectProjectUserController {
     },
   })
   async patch(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -90,7 +92,7 @@ export class ProjectProjectUserController {
     projectUser: Partial<ProjectUser>,
     @param.query.object('where', getWhereSchemaFor(ProjectUser)) where?: Where<ProjectUser>,
   ): Promise<Count> {
-    return this.projectRepository.projectUsers(id).patch(projectUser, where);
+    return this.projectRepository.projectUserInProject(id).patch(projectUser, where);
   }
 
   @del('/projects/{id}/project-users', {
@@ -102,9 +104,9 @@ export class ProjectProjectUserController {
     },
   })
   async delete(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(ProjectUser)) where?: Where<ProjectUser>,
   ): Promise<Count> {
-    return this.projectRepository.projectUsers(id).delete(where);
+    return this.projectRepository.projectUserInProject(id).delete(where);
   }
 }

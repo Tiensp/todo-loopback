@@ -1,3 +1,4 @@
+import { authenticate } from '@loopback/authentication';
 import {
   repository,
 } from '@loopback/repository';
@@ -12,6 +13,7 @@ import {
 } from '../models';
 import {TodoRepository} from '../repositories';
 
+@authenticate('jwt')
 export class TodoProjectController {
   constructor(
     @repository(TodoRepository)
@@ -31,7 +33,7 @@ export class TodoProjectController {
     },
   })
   async getProject(
-    @param.path.number('id') id: typeof Todo.prototype.id,
+    @param.path.string('id') id: typeof Todo.prototype.id,
   ): Promise<Project> {
     return this.todoRepository.project(id);
   }

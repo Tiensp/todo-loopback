@@ -1,15 +1,15 @@
 import {Entity, model, property, hasMany} from '@loopback/repository';
-import {ProjectUser} from './project-user.model';
 import {Todo} from './todo.model';
+import {ProjectUser} from './project-user.model';
 
 @model()
 export class User extends Entity {
   @property({
-    type: 'number',
+    type: 'string',
     id: true,
     generated: true,
   })
-  id?: number;
+  id?: string;
 
   @property({
     type: 'string',
@@ -36,6 +36,7 @@ export class User extends Entity {
 
   @property({
     type: 'boolean',
+    default: true,
   })
   isActive?: boolean;
 
@@ -44,11 +45,11 @@ export class User extends Entity {
   })
   lastSignInAt?: string;
 
-  @hasMany(() => ProjectUser)
-  projectUsers: ProjectUser[];
-
   @hasMany(() => Todo, {keyTo: 'assignedTo'})
-  todos: Todo[];
+  todoInUser: Todo[];
+
+  @hasMany(() => ProjectUser)
+  projectUserInUser: ProjectUser[];
 
   constructor(data?: Partial<User>) {
     super(data);

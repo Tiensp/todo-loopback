@@ -5,21 +5,21 @@ import {User} from './user.model';
 @model()
 export class Todo extends Entity {
   @property({
-    type: 'number',
+    type: 'string',
     id: true,
     generated: true,
   })
-  id?: number;
+  id?: string;
   @property({
-    type: 'number',
+    type: 'string',
     required: true,
   })
-  createdBy: number;
+  createdBy: string;
 
   @property({
-    type: 'number',
+    type: 'string',
   })
-  parentId?: number;
+  parentId?: string;
 
   @property({
     type: 'string',
@@ -34,14 +34,15 @@ export class Todo extends Entity {
 
   @property({
     type: 'boolean',
+    default: false,
   })
   isCompleted?: boolean;
 
   @belongsTo(() => Project)
-  projectId: number;
+  projectId: string;
 
-  @belongsTo(() => User, {name: 'todos'})
-  assignedTo: number;
+  @belongsTo(() => User, {name: 'userAssignedTo'})
+  assignedTo: string;
 
   constructor(data?: Partial<Todo>) {
     super(data);
