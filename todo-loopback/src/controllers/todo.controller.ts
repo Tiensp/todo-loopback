@@ -1,4 +1,5 @@
-import {authenticate} from '@loopback/authentication';
+import {authenticate, AuthenticationBindings} from '@loopback/authentication';
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -11,6 +12,7 @@ import {
   del,
   get,
   getModelSchemaRef,
+  HttpErrors,
   param,
   patch,
   post,
@@ -18,12 +20,28 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
-import {Todo} from '../models';
-import {TodoRepository} from '../repositories';
+import {securityId, UserProfile} from '@loopback/security';
+import {ERole} from '../enums/user';
+import {Project, Todo} from '../models';
+import {
+  ProjectRepository,
+  ProjectUserRepository,
+  TodoRepository,
+  UserRepository,
+} from '../repositories';
 
 @authenticate('jwt')
 export class TodoController {
   constructor(
+    @repository(ProjectUserRepository)
+    public projectUserRepository: ProjectUserRepository,
+
+    @repository(UserRepository)
+    public userRepository: UserRepository,
+
+    @repository(ProjectRepository)
+    public projectRepository: ProjectRepository,
+
     @repository(TodoRepository)
     public todoRepository: TodoRepository,
   ) {}
@@ -72,6 +90,49 @@ export class TodoController {
   })
   async find(@param.filter(Todo) filter?: Filter<Todo>): Promise<Todo[]> {
     return this.todoRepository.find(filter);
+  }
+
+  @get('/todos-in-project/{projectId}')
+  @response(200, {
+    description: 'User get todos in project',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Todo, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findTodosInProject(
+    @param.path.string('projectId') projectId: typeof Project.prototype.id,
+    @inject(AuthenticationBindings.CURRENT_USER)
+    currentUser: UserProfile,
+  ) {
+    const projectUserOfCurrentUser = await this.projectUserRepository.findOne({
+      where: {
+        userId: currentUser[securityId],
+        projectId: projectId,
+      },
+    });
+
+    if (!projectUserOfCurrentUser) {
+      throw new HttpErrors[204]('User is not belongs to this project');
+    }
+
+    if (projectUserOfCurrentUser.role === ERole.ADMIN) {
+      return this.projectRepository
+        .todoInProject(projectUserOfCurrentUser.projectId)
+        .find();
+    } else {
+      return this.projectRepository
+        .todoInProject(projectUserOfCurrentUser.projectId)
+        .find({
+          where: {
+            assignedTo: currentUser[securityId],
+          },
+        });
+    }
   }
 
   @patch('/todos')

@@ -1,6 +1,10 @@
 import {
-  /* inject, */
+  AuthenticationBindings,
+  AuthenticationMetadata,
+} from '@loopback/authentication';
+import {
   globalInterceptor,
+  inject,
   Interceptor,
   InvocationContext,
   InvocationResult,
@@ -14,9 +18,10 @@ import {
  */
 @globalInterceptor('', {tags: {name: 'authorize'}})
 export class AuthorizeInterceptor implements Provider<Interceptor> {
-  /*
-  constructor() {}
-  */
+  constructor(
+    @inject(AuthenticationBindings.METADATA)
+    public metadata: AuthenticationMetadata,
+  ) {}
 
   /**
    * This method is used by LoopBack context to produce an interceptor function
